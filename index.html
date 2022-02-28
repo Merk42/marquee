@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width"/>
+        <title>Marquee</title>
+        <meta name="description" content="tool for writing messages for marquee"/>
+        <link rel="manifest" href="./manifest.json">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet"> 
+        <style type="text/css">
+        html,
+        body{
+            box-sizing: border-box;
+        }
+        #container{
+            margin: auto;
+            max-width: 57em;
+        }
+        .card{
+            font-size: 3.5rem;
+            display:inline-block;
+            width:3rem;
+            height:4rem;
+            line-height: 4rem;
+            text-transform: uppercase;
+            border:1px solid black;
+            border-radius: 5px;
+            text-align: center;
+            font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+
+            background: rgb(238,238,238);
+background: linear-gradient(349deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,1) 100%); 
+        }
+        .card.X{
+            transform: rotateX(180deg);
+        }
+        .card.Y{
+            transform: rotateY(180deg);
+        }
+        .card.Z{
+            transform: rotateZ(180deg);
+        }
+        #marquee{
+            border:1px solid black;
+            width:25rem;
+            margin:auto;
+        }
+        #marquee > div{
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            margin:.5rem 0;
+            height:4rem;
+            display: flex;
+            justify-content: flex-start;
+            background-color: #EEE;
+        }
+        #marquee > div.center{
+            justify-content: center;
+        }
+        #marquee > div.right{
+            justify-content: flex-end;
+        }
+
+        label,
+        legend{
+            border:none;
+            padding:0;
+            margin:0;
+            font-size:1rem;
+            display: block;
+            width:100%
+
+        }
+        fieldset{
+            border:none;
+            padding:0;
+        }
+        input[type='text'],
+        input[type='radio']+label{
+            height:1rem;
+            display: block;
+            padding: .25rem;
+            border: 1px solid black;
+            
+        }       
+        .radios,
+        #UI{
+            display: flex;
+        }
+        #UI {
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+        .radios [type='radio']{
+            width: 0;
+            opacity: 0;
+            position: absolute;
+        }
+        .radios [type='radio']:checked+label{
+            background-color:lightblue;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div id="UI">
+
+                <div id="copy">
+                    <div>
+                        <label for="top-input">top copy</label>
+                        <input id="top-input" type="text" maxlength="8"/>
+                    </div>
+                    <div>
+                        <label for="middle-input">middle copy</label>
+                        <input id="middle-input" type="text" maxlength="8"/>
+                    </div>
+                    <div>
+                        <label for="bottom-input">bottom copy</label>
+                        <input id="bottom-input" type="text" maxlength="8"/>
+                    </div>
+                </div>
+    
+                <div id="alignment">
+                    <fieldset>
+                        <legend>top</legend>
+                        <div class="radios">
+                            <input id="top-left" type="radio" name="top" value="left" checked>
+                            <label for="top-left">left</label>
+                            <input id="top-center" type="radio" name="top" value="center">
+                            <label for="top-center">center</label>
+                            <input id="top-right" type="radio" name="top" value="right">
+                            <label for="top-right">right</label>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>middle</legend>
+                        <div class="radios">
+                            <input id="middle-left" type="radio" name="middle" value="left" checked>
+                            <label for="middle-left">left</label>
+                            <input id="middle-center" type="radio" name="middle" value="center">
+                            <label for="middle-center">center</label>
+                            <input id="middle-right" type="radio" name="middle" value="right">
+                            <label for="middle-right">right</label>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>bottom</legend>
+                        <div class="radios">
+                            <input id="bottom-left" type="radio" name="bottom" value="left" checked>
+                            <label for="bottom-left">left</label>
+                            <input id="bottom-center" type="radio" name="bottom" value="center">
+                            <label for="bottom-center">center</label>
+                            <input id="bottom-right" type="radio" name="bottom" value="right">
+                            <label for="bottom-right">right</label>
+                        </div>
+                    </fieldset>
+                </div>
+                
+            </div>
+    
+    
+    
+            <div id="marquee">
+                <div>
+                    <div id="top-output" class="output"></div>
+                </div>
+                <div>
+                    <div id="middle-output" class="output"></div>
+                </div>
+                <div>
+                    <div id="bottom-output" class="output"></div>
+                </div>
+            </div>
+    
+        </div>
+
+
+        <script type="text/javascript">
+       
+        function resetDeck(){
+            return {
+            "A": {
+                count:4
+            },
+            "B": {
+                count:2,
+                alts: [
+                    {
+                        "char":"P",
+                        "layout":"X"
+                    }
+                ]
+            },
+            "C": {
+                count:2
+            },
+            "D": {
+                count:2,
+                alts: [
+                    {
+                        "char":"P",
+                        "layout":"Z"
+                    }
+                ]
+            },
+            "E": {
+                count:4,
+                alts: [
+                    {
+                        "char":"3",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "F": {
+                count:2
+            },
+            "G": {
+                count:2
+            },
+            "H": {
+                count:2
+            },
+            "I": {
+                count:3
+            },
+            "J": {
+                count:2,
+                alts: [
+                    {
+                        "char":"L",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "K": {
+                count:2
+            },
+            "L": {
+                count:3,
+                alts: [
+                    {
+                        "char":"7",
+                        "layout":"Z"
+                    },
+                    {
+                        "char":"J",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "M": {
+                count:2,
+                alts: [
+                    {
+                        "char":"W",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "N": {
+                count:2
+            },
+            "O": {
+                count:4
+            },
+            "P": {
+                count:2
+            },
+            "Q": {
+                count:2,
+                alts: [
+                    {
+                        "char":"P",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "R": {
+                count:3
+            },
+            "S": {
+                count:3,
+                alts: [
+                    {
+                        "char":"2",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "T": {
+                count:2
+            },
+            "U": {
+                count:3
+            },
+            "V": {
+                count:2
+            },
+            "W": {
+                count:2,
+                alts: [
+                    {
+                        "char":"M",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "X": {
+                count:2
+            },
+            "Y": {
+                count:2
+            },
+            "Z": {
+                count:2
+            },
+            "0": {
+                count:0,
+                alts: [
+                    {
+                        "char": "O"
+                    }
+                ]
+            },
+            "1": {
+                count:2
+            },
+            "2": {
+                count:2
+            },
+            "3": {
+                count:2,
+                alts: [
+                    {
+                        "char":"E",
+                        "layout":"Y"
+                    }
+                ]
+            },
+            "4": {
+                count:2
+            },
+            "5": {
+                count:2,
+                alts: [
+                    {
+                        "char":"2",
+                        "layout":"X"
+                    }
+                ]
+            },
+            "6": {
+                count:2,
+                alts: [
+                    {
+                        "char":"9",
+                        "layout":"Z"
+                    }
+                ]
+            },
+            "7": {
+                count:2,
+                alts: [
+                    {
+                        "char":"L",
+                        "layout":"Z"
+                    }
+                ]
+            },
+            "8": {
+                count:2
+            },
+            "9": {
+                count:2,
+                alts: [
+                    {
+                        "char":"6",
+                        "layout":"Z"
+                    }
+                ]
+            },
+            "$": {
+                count:1
+            },
+            "?": {
+                count:1
+            },
+            "@": {
+                count:1
+            },
+            "+": {
+                count:1
+            },
+            "=": {
+                count:1
+            },
+            "!": {
+                count:1
+            },
+            "&": {
+                count:1
+            }}
+        }
+
+        function update() {
+            const ROWS = ['top', 'middle', 'bottom'];
+            let CARDS = resetDeck();
+            for (const row of ROWS){
+                output(row, CARDS);
+            }
+        }
+
+        function output(section, DECK){
+            const OPTIONS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$?@+=!&';
+            const UNAVAILABLECARD = "<span class='card'>*</span>";
+            const INPUT  = document.getElementById(section + "-input");
+            const OUTPUT  = document.getElementById(section + "-output");
+            const CHARACTERS = INPUT.value.toUpperCase().split("");
+            let CARDS = DECK;
+            let OUTPUTVALUE = "";
+            for (const C of CHARACTERS){
+                // need to check if character is in deck (or a space) at all!
+                if (C === ' '){
+                    OUTPUTVALUE += "&nbsp;";
+                } else {
+                    if (OPTIONS.includes(C)){                    
+                        if (CARDS[C].count > 0){
+                            OUTPUTVALUE += "<span class='card'>" + C + "</span>";
+                            CARDS[C].count--;
+                        } else {
+                            altUsed = false;
+                            if (CARDS[C].alts){
+                                for (const A of CARDS[C].alts){
+                                    if (CARDS[A.char].count > 0){
+                                        OUTPUTVALUE += "<span class='card " + A.layout +"'>" + A.char + "</span>";
+                                        altUsed = true;
+                                        CARDS[A.char].count--; 
+                                        break;
+                                    }
+                                }
+                                if (!altUsed) {
+                                    OUTPUTVALUE += UNAVAILABLECARD;
+                                }
+                            } else {
+                                OUTPUTVALUE += UNAVAILABLECARD;
+                            }
+                        }
+                    } else {
+                        OUTPUTVALUE += UNAVAILABLECARD;
+                    }
+                }
+            }
+            OUTPUT.innerHTML = OUTPUTVALUE
+        }
+        
+        function addAlignmentListeners(){
+            var rad = document.querySelectorAll("[type='radio']");
+            var prev = null;
+            for (var i = 0; i < rad.length; i++) {
+                
+                if (rad[i].checked){
+                    const ROW = rad[i].id.split('-')[0];
+                    const ALIGNMENT = rad[i].value;
+                    alignrow(ROW, ALIGNMENT)
+                }
+                rad[i].addEventListener('change', function() {
+                    // (prev) ? console.log(prev.value): null;
+                    if (this !== prev) {
+                        prev = this;
+                    }
+                    alignrow(this.name, this.value)
+                });
+            }
+        }
+
+        function alignrow(row, alignment){
+            var aligningInput = document.getElementById(row + "-output").parentNode;
+                aligningInput.classList.remove("left", "center", "right");
+                aligningInput.classList.add(alignment);
+        }
+
+        function addInputListeners() {
+            var inputtext =  document.querySelectorAll("[type='text']");
+            for (var i = 0; i < inputtext.length; i++) {
+                inputtext[i].addEventListener('keyup', function() {
+                update() 
+                });
+            }
+        }
+        
+        update();
+        addInputListeners();
+        addAlignmentListeners();
+        </script>
+
+        <script type="text/javascript">
+        // Check that service workers are registered
+        if ('serviceWorker' in navigator) {
+            // Use the window load event to keep the page load performant
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./my-service-worker.js');
+            });
+        }
+        </script>
+    </body>
+</html>
